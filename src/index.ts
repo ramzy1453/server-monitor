@@ -1,7 +1,6 @@
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import { logger } from 'hono/logger'
-import { z } from 'zod'
 
 const app = new Hono()
 

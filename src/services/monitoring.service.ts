@@ -1,6 +1,7 @@
 import { exec } from 'child_process'
 import os from 'os'
 import util from 'util'
+import { formatBytes, formatUptime } from '../utils/format.js'
 
 const execPromise = util.promisify(exec)
 
@@ -12,11 +13,11 @@ export default class MonitoringService {
     const uptime = os.uptime()
 
     return {
-      totalMem: this.formatBytes(totalMem),
-      freeMem: this.formatBytes(freeMem),
-      usedMem: this.formatBytes(totalMem - freeMem),
-      cpuUsage,
-      uptime: this.formatUptime(uptime)
+      totalMem: formatBytes(totalMem),
+      freeMem: formatBytes(freeMem),
+      usedMem: formatBytes(totalMem - freeMem),
+      uptime: formatUptime(uptime),
+      cpuUsage
     }
   }
 
@@ -28,11 +29,12 @@ export default class MonitoringService {
       const matches = stdout.match(/FreeSpace=(\d+).*Size=(\d+)/s)
 
       if (matches) {
-        const [_, total, free] = matches.map(parseInt)
+        const total = parseInt(matches[2])
+        const free = parseInt(matches[1])
         return {
-          total: this.formatBytes(total),
-          free: this.formatBytes(free),
-          used: this.formatBytes(total - free)
+          total: formatBytes(total),
+          free: formatBytes(free),
+          used: formatBytes(total - free)
         }
       }
       return null
@@ -54,7 +56,7 @@ export default class MonitoringService {
             return {
               pid: parseInt(parts.pop() || '0'),
               name: parts[0],
-              memory: this.formatBytes(parseInt(parts.pop() || '0'))
+              memory: formatBytes(parseInt(parts.pop() || '0'))
             }
           }
           return null
@@ -62,6 +64,14 @@ export default class MonitoringService {
         .filter((p) => p !== null)
     } catch (error) {
       return []
+    }
+  }
+  async checkServiceStatus(serviceName: string) {
+    try {
+      const { stdout } = await execPromise(`sc query ${serviceName}`)
+      return stdout.includes('RUNNING') ? 'running' : 'stopped'
+    } catch (error) {
+      return 'unknown'
     }
   }
 
@@ -73,18 +83,5 @@ export default class MonitoringService {
     } catch (error) {
       return 'N/A'
     }
-  }
-
-  private formatBytes(bytes: number): string {
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
-    if (bytes === 0) return '0 Byte'
-    const i = Math.floor(Math.log(bytes) / Math.log(1024))
-    return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`
-  }
-
-  private formatUptime(seconds: number): string {
-    const h = Math.floor(seconds / 3600)
-    const m = Math.floor((seconds % 3600) / 60)
-    return `${h}h ${m}m`
   }
 }

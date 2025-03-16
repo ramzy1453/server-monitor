@@ -28,7 +28,37 @@ export default class FilesController {
       return createResponse(c, null, error.message, 404)
     }
   }
-  createFile = async (c: Context) => {}
-  deleteFile = async (c: Context) => {}
-  editFile = async (c: Context) => {}
+  createFile = async (c: Context) => {
+    const filePath = c.req.query('filePath')!
+    const { content } = await c.req.json()
+
+    try {
+      await this.filesService.createFile(filePath, content)
+      return createResponse(c, null, 'File created successfully', 200)
+    } catch (error: any) {
+      return createResponse(c, null, error.message, 404)
+    }
+  }
+
+  deleteFile = async (c: Context) => {
+    const filePath = c.req.query('filePath')!
+    try {
+      await this.filesService.deleteFile(filePath)
+      return createResponse(c, null, 'File deleted successfully', 200)
+    } catch (error: any) {
+      return createResponse(c, null, error.message, 404)
+    }
+  }
+
+  editFile = async (c: Context) => {
+    const filePath = c.req.query('filePath')!
+    const { content } = await c.req.json()
+
+    try {
+      await this.filesService.editFile(filePath, content)
+      return createResponse(c, null, 'File edited successfully', 200)
+    } catch (error: any) {
+      return createResponse(c, null, error.message, 404)
+    }
+  }
 }

@@ -1,5 +1,4 @@
 import fs from 'fs/promises'
-import path from 'path'
 
 export default class FilesService {
   async listFiles(dirPath?: string) {
@@ -16,29 +15,14 @@ export default class FilesService {
   }
 
   async createFile(filePath: string, content: string) {
-    try {
-      await fs.writeFile(filePath, content, 'utf-8')
-      return 'File created successfully'
-    } catch (error) {
-      throw new Error('Error creating file')
-    }
+    await fs.writeFile(filePath, content, 'utf-8')
   }
 
   async deleteFile(filePath: string) {
-    try {
-      await fs.unlink(filePath)
-      return 'File deleted successfully'
-    } catch (error) {
-      throw new Error('Error deleting file')
-    }
+    await fs.unlink(filePath)
   }
 
-  async editFile(filePath: string, newContent: string) {
-    try {
-      await fs.writeFile(filePath, newContent, 'utf-8')
-      return 'File edited successfully'
-    } catch (error) {
-      throw new Error('Error editing file')
-    }
+  async editFile(filePath: string, content: string) {
+    await fs.writeFile(filePath, content, 'utf-8')
   }
 }

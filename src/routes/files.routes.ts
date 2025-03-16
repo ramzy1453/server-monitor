@@ -1,25 +1,19 @@
-import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import FilesController from '../controllers/files.controller.js'
-import { z } from 'zod'
+import FilesValidator from '../lib/validators/files.validator.js'
 
 const filesRoutes = new Hono()
 const filesController = new FilesController()
+const filesValidator = new FilesValidator()
 
-const dirValidator = zValidator(
-  'query',
-  z.object({
-    dirPath: z.string().optional()
-  })
+filesRoutes.get('/list', filesValidator.listFiles(), filesController.listFiles)
+filesRoutes.get('/read', filesValidator.getFile(), filesController.readFile)
+filesRoutes.post('/create', filesValidator.saveFile(), filesController.readFile)
+filesRoutes.put('/edit', filesValidator.saveFile(), filesController.readFile)
+filesRoutes.delete(
+  '/delete',
+  filesValidator.getFile(),
+  filesController.readFile
 )
-const fileValidator = zValidator(
-  'query',
-  z.object({
-    filePath: z.string()
-  })
-)
-
-filesRoutes.get('/list', dirValidator, filesController.listFiles)
-filesRoutes.get('/read', fileValidator, filesController.readFile)
 
 export { filesRoutes }

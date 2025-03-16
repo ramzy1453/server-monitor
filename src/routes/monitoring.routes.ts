@@ -10,8 +10,8 @@ monitoringRoutes.get('/stats', monitoringController.getStats)
 monitoringRoutes.get('/processes', monitoringController.getProcesses)
 monitoringRoutes.get('/disk', monitoringController.getDiskUsage)
 monitoringRoutes.get(
-  '/service/:serviceName',
-  zValidator('param', z.object({ serviceName: z.string() })),
+  '/service/:service',
+  zValidator('param', z.object({ service: z.string() })),
   monitoringController.checkServiceStatus
 )
 

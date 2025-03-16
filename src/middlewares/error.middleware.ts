@@ -4,8 +4,6 @@ import type { BlankEnv } from 'hono/types'
 import { createResponse } from '../utils/response.js'
 
 export const errorMiddleware: ErrorHandler<BlankEnv> = async (err, c) => {
-  console.error('[Error]:', err)
-
   if (err instanceof HTTPException) {
     const response = err.getResponse()
     const data = await response.json()

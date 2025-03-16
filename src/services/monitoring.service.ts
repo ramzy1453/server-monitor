@@ -66,9 +66,9 @@ export default class MonitoringService {
       return []
     }
   }
-  async checkServiceStatus(serviceName: string) {
+  async checkServiceStatus(service: string) {
     try {
-      const { stdout } = await execPromise(`sc query ${serviceName}`)
+      const { stdout } = await execPromise(`sc query ${service}`)
       return stdout.includes('RUNNING') ? 'running' : 'stopped'
     } catch (error) {
       return 'unknown'
